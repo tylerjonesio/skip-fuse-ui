@@ -6,12 +6,12 @@ import SkipUI
 public final class BridgedStateBox<Value> {
     private let comparator: (Value, Value) -> Bool
 
-    init(_ value: Value, comparator: @escaping (Value, Value) -> Bool) {
+    public init(_ value: Value, comparator: @escaping (Value, Value) -> Bool) {
         self._value = Box(value)
         self.comparator = comparator
     }
 
-    var value: Value {
+    public var value: Value {
         get {
             Java_stateSupport?.access()
             return _value.value
@@ -38,6 +38,10 @@ public final class BridgedStateBox<Value> {
         let box: Box<Value> = support.valueHolder.pointee()!
         _value = box
         Java_stateSupport = support
+    }
+    
+    public func forceUpdate() {
+        Java_stateSupport?.update()
     }
 }
 
