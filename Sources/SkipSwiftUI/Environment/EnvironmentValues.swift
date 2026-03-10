@@ -7,6 +7,8 @@ import Foundation
 import SkipBridge
 import SkipUI
 
+let envLogger: Logger = Logger(subsystem: "io.nogosoft.ipcams", category: "EnvValues")
+
 public struct EnvironmentValues : CustomStringConvertible {
     public init() {
     }
@@ -244,6 +246,8 @@ extension View {
     nonisolated public func environment<V>(_ keyPath: WritableKeyPath<EnvironmentValues, V>, _ value: V) -> some View {
         return ModifierView(target: self) {
             let key = EnvironmentValues.key(for: keyPath)
+            let desc = String(describing: keyPath)
+            envLogger.error("Setting env for key: \(desc), \(key)")
             let view = $0.Java_viewOrEmpty
             if key.hasPrefix("userkey:") {
                 let ptr = SwiftObjectPointer.pointer(to: Box(value), retain: true)

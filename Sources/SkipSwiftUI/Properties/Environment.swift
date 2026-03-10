@@ -8,7 +8,10 @@ import SkipUI
     private let valueBox: Box<Box<Value>?> = Box(nil)
 
     /* @inlinable */ public init(_ keyPath: KeyPath<EnvironmentValues, Value>) {
-        self.key = EnvironmentValues.key(for: keyPath)
+        let key = EnvironmentValues.key(for: keyPath)
+        let desc = String(describing: keyPath)
+        envLogger.error("Setting env reader key: \(desc), \(key)")
+        self.key = key
         self.defaultValue = { EnvironmentValues.shared[keyPath: keyPath] }
     }
 
