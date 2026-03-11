@@ -263,7 +263,8 @@ extension View {
         return ModifierView(target: self) {
             let key = EnvironmentValues.key(for: keyPath)
             let desc = String(describing: keyPath)
-            envLogger.error("Setting env for key: \(desc), \(key)")
+            let handle = #dsohandle
+            envLogger.error("Setting env for key: \(desc), \(key). \(String(describing: handle))")
             let view = $0.Java_viewOrEmpty
             if key.hasPrefix("userkey:") {
                 let ptr = SwiftObjectPointer.pointer(to: Box(value), retain: true)

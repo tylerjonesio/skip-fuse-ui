@@ -10,7 +10,8 @@ import SkipUI
     /* @inlinable */ public init(_ keyPath: KeyPath<EnvironmentValues, Value>) {
         let key = EnvironmentValues.key(for: keyPath)
         let desc = String(describing: keyPath)
-        envLogger.error("Setting env reader key: \(desc), \(key)")
+        let handle = #dsohandle
+        envLogger.error("Setting env reader key: \(desc), \(key), \(String(describing: handle))")
         self.key = key
         self.defaultValue = { EnvironmentValues.shared[keyPath: keyPath] }
     }
