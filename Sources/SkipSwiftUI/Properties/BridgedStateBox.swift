@@ -16,9 +16,7 @@ public final class BridgedStateBox<Value> {
     init(_ value: Value) where Value: OpenCombine.ObservableObject {
         self._value = Box(value)
         self.comparator = { _, _ in false }
-        self.cancellable = value.objectWillChange.sink { [weak self] _ in
-            self?.Java_stateSupport?.update()
-        }
+        self.addObserver(to: value)
     }
 
     var value: Value {
@@ -47,7 +45,16 @@ public final class BridgedStateBox<Value> {
     public func Java_syncStateSupport(_ support: StateSupport) {
         let box: Box<Value> = support.valueHolder.pointee()!
         _value = box
+        if let observable = box.value as? any OpenCombine.ObservableObject {
+            self.addObserver(to: observable)
+        }
         Java_stateSupport = support
+    }
+    
+    private func addObserver(to value: some OpenCombine.ObservableObject)  {
+        self.cancellable = value.objectWillChange.sink { [weak self] _ in
+            self?.Java_stateSupport?.update()
+        }
     }
 }
 
