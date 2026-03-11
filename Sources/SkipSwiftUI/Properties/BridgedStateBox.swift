@@ -1,6 +1,7 @@
 // Copyright 2025 Skip
 // SPDX-License-Identifier: LGPL-3.0-only WITH LGPL-3.0-linking-exception
 import OpenCombine
+import OpenCombineDispatch
 import SkipBridge
 import SkipUI
 
@@ -27,6 +28,9 @@ public final class BridgedStateBox<Value> {
         set {
             let isUpdate = !comparator(_value.value, newValue)
             _value.value = newValue
+            if let observable = newValue as? any OpenCombine.ObservableObject {
+                self.addObserver(to: observable)
+            }
             if isUpdate {
                 Java_stateSupport?.update()
             }
@@ -52,7 +56,7 @@ public final class BridgedStateBox<Value> {
     }
     
     private func addObserver(to value: some OpenCombine.ObservableObject)  {
-        self.cancellable = value.objectWillChange.sink { [weak self] _ in
+        self.cancellable = value.objectWillChange.receive(on: DispatchQueue.main).sink { [weak self] _ in
             self?.Java_stateSupport?.update()
         }
     }
