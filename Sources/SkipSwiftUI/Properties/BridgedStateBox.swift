@@ -1,17 +1,27 @@
 // Copyright 2025 Skip
 // SPDX-License-Identifier: LGPL-3.0-only WITH LGPL-3.0-linking-exception
+import OpenCombine
 import SkipBridge
 import SkipUI
 
 public final class BridgedStateBox<Value> {
     private let comparator: (Value, Value) -> Bool
+    private var cancellable: AnyCancellable?
 
-    public init(_ value: Value, comparator: @escaping (Value, Value) -> Bool) {
+    init(_ value: Value, comparator: @escaping (Value, Value) -> Bool) {
         self._value = Box(value)
         self.comparator = comparator
     }
+    
+    init(_ value: Value) where Value: OpenCombine.ObservableObject {
+        self._value = Box(value)
+        self.comparator = { _, _ in false }
+        self.cancellable = value.objectWillChange.sink { [weak self] _ in
+            self?.Java_stateSupport?.update()
+        }
+    }
 
-    public var value: Value {
+    var value: Value {
         get {
             Java_stateSupport?.access()
             return _value.value
@@ -38,10 +48,6 @@ public final class BridgedStateBox<Value> {
         let box: Box<Value> = support.valueHolder.pointee()!
         _value = box
         Java_stateSupport = support
-    }
-    
-    public func forceUpdate() {
-        Java_stateSupport?.update()
     }
 }
 

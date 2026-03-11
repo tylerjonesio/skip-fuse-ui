@@ -1,9 +1,14 @@
 // Copyright 2025 Skip
 // SPDX-License-Identifier: LGPL-3.0-only WITH LGPL-3.0-linking-exception
+import OpenCombine
 import SkipBridge
 
 @frozen @propertyWrapper public struct State<Value> : DynamicProperty {
     private let valueBox: BridgedStateBox<Value>
+    
+    public init(wrappedValue value: Value) where Value : OpenCombine.ObservableObject {
+        self.valueBox = BridgedStateBox(value)
+    }
 
     public init(wrappedValue value: Value) where Value : Equatable {
         self.valueBox = BridgedStateBox(value, comparator: { $0 == $1 })

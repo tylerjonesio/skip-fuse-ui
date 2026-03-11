@@ -16,7 +16,8 @@ let package = Package(
         .package(url: "https://source.skip.tools/skip-bridge.git", "0.16.7"..<"2.0.0"),
         .package(url: "https://source.skip.tools/skip-android-bridge.git", "0.6.1"..<"2.0.0"),
         .package(url: "https://source.skip.tools/swift-jni.git", "0.3.1"..<"2.0.0"),
-        .package(url: "https://source.skip.tools/skip-ui.git", from: "1.50.0")
+        .package(url: "https://source.skip.tools/skip-ui.git", from: "1.50.0"),
+        .package(url: "https://github.com/OpenCombine/OpenCombine", branch: "master")
     ],
     targets: [
         .target(name: "SkipFuseUI", dependencies: ["SkipSwiftUI"]),
@@ -25,7 +26,8 @@ let package = Package(
             .product(name: "SkipBridge", package: "skip-bridge"),
             .product(name: "SkipAndroidBridge", package: "skip-android-bridge"),
             .product(name: "SwiftJNI", package: "swift-jni"),
-            .product(name: "SkipUI", package: "skip-ui")
+            .product(name: "SkipUI", package: "skip-ui"),
+            .product(name: "OpenCombine", package: "OpenCombine"),
         ], plugins: [.plugin(name: "skipstone", package: "skip")]),
         .testTarget(name: "SkipSwiftUITests", dependencies: [
             "SkipSwiftUI",
