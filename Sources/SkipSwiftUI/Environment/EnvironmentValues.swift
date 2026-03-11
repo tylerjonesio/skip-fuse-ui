@@ -36,7 +36,7 @@ extension EnvironmentValues {
 
     /// Return a bridgable key to use for the given key path value.
     static func key<Value>(for keyPath: KeyPath<EnvironmentValues, Value>) -> String {
-        return key(forAny: keyPath)
+        return key(forKeyPath: keyPath)
     }
 
     /// Return a bridgable key to use for the given observable value.
@@ -223,8 +223,24 @@ extension EnvironmentValues {
         keys[\EnvironmentValues.verticalSizeClass] = "verticalSizeClass"
         return keys
     }()
+    
+    nonisolated(unsafe) private static var customKeys: [PartialKeyPath<EnvironmentValues>: String] = [:]
 
     // MARK: -
+    
+    private static func key(forKeyPath keyPath: PartialKeyPath<EnvironmentValues>) -> String {
+        if let key = keys[keyPath] {
+            return key
+        }
+        
+        if let key = customKeys[keyPath] {
+            return key
+        }
+        
+        let key = nextKey
+        customKeys[keyPath] = key
+        return key
+    }
 
     private static func key(forAny hashable: AnyHashable) -> String {
         if let key = keys[hashable] {
